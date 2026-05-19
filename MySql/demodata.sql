@@ -1,0 +1,85 @@
+USE matchpaw_db;
+
+-- =========================
+-- 1. animals
+-- =========================
+
+INSERT INTO animals
+(name, species, breed, age, sex, intake_date, adoption_status, health_status, notes)
+VALUES
+('Buddy', 'Dog', 'Labrador Retriever', 3, 'Male', '2025-11-10', 'Available', 'Healthy', 'Friendly and energetic dog. Good with families.'),
+('Luna', 'Cat', 'Domestic Shorthair', 2, 'Female', '2025-12-02', 'Available', 'Healthy', 'Calm and affectionate. Enjoys quiet spaces.'),
+('Max', 'Dog', 'German Shepherd', 5, 'Male', '2025-10-18', 'Pending', 'Under Treatment', 'Recovering from a minor leg injury.'),
+('Bella', 'Cat', 'Siamese Mix', 4, 'Female', '2025-09-25', 'Adopted', 'Healthy', 'Very social and already adopted.'),
+('Rocky', 'Dog', 'Beagle', 1, 'Male', '2026-01-08', 'Available', 'Healthy', 'Playful puppy. Needs basic training.'),
+('Daisy', 'Rabbit', 'Holland Lop', 2, 'Female', '2026-01-20', 'Available', 'Healthy', 'Gentle rabbit. Good for experienced owners.');
+
+-- =========================
+-- 2. users
+-- password_hash values are temporary demo placeholders.
+-- Real passwords should be hashed by the backend.
+-- =========================
+
+INSERT INTO users
+(full_name, email, password_hash, role, is_active)
+VALUES
+('Sarah Johnson', 'admin@matchpaw.org', 'TEMP_HASH_ADMIN', 'Admin', TRUE),
+('Michael Brown', 'staff@matchpaw.org', 'TEMP_HASH_STAFF', 'Staff', TRUE),
+('Emily Davis', 'adoption@matchpaw.org', 'TEMP_HASH_ADOPTION', 'AdoptionRepresentative', TRUE),
+('Tom Lee', 'volunteer@matchpaw.org', 'TEMP_HASH_VOLUNTEER', 'Volunteer', TRUE);
+
+-- =========================
+-- 3. applicants
+-- =========================
+
+INSERT INTO applicants
+(full_name, email, phone, address)
+VALUES
+('John Smith', 'john.smith@example.com', '555-123-4567', '123 Main Street, Queens, NY'),
+('Maria Garcia', 'maria.garcia@example.com', '555-234-5678', '45 Park Avenue, Brooklyn, NY'),
+('Kevin Wilson', 'kevin.wilson@example.com', '555-345-6789', '88 River Road, Bronx, NY'),
+('Aiko Tanaka', 'aiko.tanaka@example.com', '555-456-7890', '19 Maple Street, New York, NY');
+
+-- =========================
+-- 4. medical_records
+-- animal_id must match animals above
+-- =========================
+
+INSERT INTO medical_records
+(animal_id, record_date, treatment_type, description, veterinarian_name, next_appointment)
+VALUES
+(1, '2025-11-12', 'Initial Checkup', 'General health check completed. No major issues found.', 'Dr. Miller', '2026-05-12'),
+(2, '2025-12-04', 'Vaccination', 'Received core vaccination.', 'Dr. Smith', '2026-06-04'),
+(3, '2025-10-20', 'Injury Treatment', 'Minor leg injury treated. Recovery is in progress.', 'Dr. Miller', '2026-02-20'),
+(4, '2025-09-27', 'Spay Surgery', 'Spay surgery completed successfully.', 'Dr. Green', NULL),
+(5, '2026-01-10', 'Initial Checkup', 'Healthy puppy. Recommended training and vaccination schedule.', 'Dr. Smith', '2026-03-10'),
+(6, '2026-01-22', 'Dental Check', 'Basic dental check completed. No issues found.', 'Dr. Green', '2026-07-22');
+
+-- =========================
+-- 5. care_logs
+-- user_id must match users above
+-- =========================
+
+INSERT INTO care_logs
+(animal_id, user_id, log_date, feeding_notes, cleaning_notes, behavior_notes)
+VALUES
+(1, 2, '2026-02-01', 'Ate all food.', 'Kennel cleaned.', 'Very friendly and active.'),
+(1, 4, '2026-02-02', 'Ate most food.', 'Water bowl replaced.', 'Enjoyed outdoor walk.'),
+(2, 2, '2026-02-01', 'Ate slowly.', 'Litter box cleaned.', 'Calm and relaxed.'),
+(3, 2, '2026-02-01', 'Ate all food.', 'Kennel cleaned.', 'Still limping slightly.'),
+(5, 4, '2026-02-03', 'Ate all puppy food.', 'Kennel cleaned.', 'Very playful.'),
+(6, 4, '2026-02-03', 'Ate hay and vegetables.', 'Cage cleaned.', 'Gentle and quiet.');
+
+-- =========================
+-- 6. adoption_applications
+-- reviewed_by can be NULL if not reviewed yet
+-- =========================
+
+INSERT INTO adoption_applications
+(animal_id, applicant_id, application_date, status, reason, reviewed_by, reviewed_date)
+VALUES
+(1, 1, '2026-02-05', 'Pending', 'I have experience with dogs and want a family-friendly pet.', NULL, NULL),
+(2, 2, '2026-02-06', 'UnderReview', 'I live in a quiet apartment and would like to adopt a calm cat.', 3, NULL),
+(3, 3, '2026-02-07', 'Pending', 'I am interested in adopting Max after he recovers.', NULL, NULL),
+(4, 4, '2025-10-10', 'Approved', 'I have owned cats before and can provide a stable home.', 3, '2025-10-12'),
+(5, 1, '2026-02-08', 'Rejected', 'Applicant already has a pending application for another dog.', 3, '2026-02-09');

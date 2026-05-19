@@ -1,0 +1,6 @@
+@Match_Pow_backend_HostAddress = http://localhost:5256
+
+GET {{Match_Pow_backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
