@@ -1,5 +1,20 @@
 USE matchpaw_db;
 
+-- Delete child tables first because of foreign keys
+DELETE FROM adoption_applications;
+DELETE FROM care_logs;
+DELETE FROM medical_records;
+DELETE FROM applicants;
+DELETE FROM users;
+DELETE FROM animals;
+
+ALTER TABLE adoption_applications AUTO_INCREMENT = 1;
+ALTER TABLE care_logs AUTO_INCREMENT = 1;
+ALTER TABLE medical_records AUTO_INCREMENT = 1;
+ALTER TABLE applicants AUTO_INCREMENT = 1;
+ALTER TABLE users AUTO_INCREMENT = 1;
+ALTER TABLE animals AUTO_INCREMENT = 1;
+
 -- =========================
 -- 1. animals
 -- =========================
@@ -30,15 +45,19 @@ VALUES
 
 -- =========================
 -- 3. applicants
+-- New fields included:
+-- housing_type, has_pets, has_children,
+-- experience_with_pets, preferred_contact_method
 -- =========================
 
 INSERT INTO applicants
-(full_name, email, phone, address)
+(full_name, email, phone, address, housing_type, has_pets, has_children, experience_with_pets, preferred_contact_method)
 VALUES
-('John Smith', 'john.smith@example.com', '555-123-4567', '123 Main Street, Queens, NY'),
-('Maria Garcia', 'maria.garcia@example.com', '555-234-5678', '45 Park Avenue, Brooklyn, NY'),
-('Kevin Wilson', 'kevin.wilson@example.com', '555-345-6789', '88 River Road, Bronx, NY'),
-('Aiko Tanaka', 'aiko.tanaka@example.com', '555-456-7890', '19 Maple Street, New York, NY');
+('John Smith', 'john.smith@example.com', '555-123-4567', '123 Main Street, Queens, NY', 'House', TRUE, TRUE, 'Experienced with dogs', 'Email'),
+('Maria Garcia', 'maria.garcia@example.com', '555-234-5678', '45 Park Avenue, Brooklyn, NY', 'Apartment', FALSE, FALSE, 'First-time pet owner', 'Email'),
+('Kevin Wilson', 'kevin.wilson@example.com', '555-345-6789', '88 River Road, Bronx, NY', 'House', TRUE, FALSE, 'Experienced with large dogs', 'Phone'),
+('Aiko Tanaka', 'aiko.tanaka@example.com', '555-456-7890', '19 Maple Street, New York, NY', 'Apartment', FALSE, TRUE, 'Grew up with cats', 'Email'),
+('Olivia Martinez', 'olivia.martinez@example.com', '555-567-8901', '200 Garden Avenue, Jersey City, NJ', 'Townhouse', TRUE, FALSE, 'Has experience with rabbits and cats', 'Phone');
 
 -- =========================
 -- 4. medical_records
@@ -72,14 +91,71 @@ VALUES
 
 -- =========================
 -- 6. adoption_applications
+-- New fields included:
+-- living_situation, work_schedule, has_yard,
+-- landlord_approval, other_pets_details
 -- reviewed_by can be NULL if not reviewed yet
 -- =========================
 
 INSERT INTO adoption_applications
-(animal_id, applicant_id, application_date, status, reason, reviewed_by, reviewed_date)
+(animal_id, applicant_id, application_date, status, reason, living_situation, work_schedule, has_yard, landlord_approval, other_pets_details, reviewed_by, reviewed_date)
 VALUES
-(1, 1, '2026-02-05', 'Pending', 'I have experience with dogs and want a family-friendly pet.', NULL, NULL),
-(2, 2, '2026-02-06', 'UnderReview', 'I live in a quiet apartment and would like to adopt a calm cat.', 3, NULL),
-(3, 3, '2026-02-07', 'Pending', 'I am interested in adopting Max after he recovers.', NULL, NULL),
-(4, 4, '2025-10-10', 'Approved', 'I have owned cats before and can provide a stable home.', 3, '2025-10-12'),
-(5, 1, '2026-02-08', 'Rejected', 'Applicant already has a pending application for another dog.', 3, '2026-02-09');
+(1, 1, '2026-02-05', 'Pending',
+ 'I have experience with dogs and want a family-friendly pet.',
+ 'Lives in a house with a fenced backyard. Family members are comfortable with dogs.',
+ 'Full-time office job, but family members are home during the day.',
+ TRUE,
+ TRUE,
+ 'Currently has one older friendly dog.',
+ NULL,
+ NULL),
+
+(2, 2, '2026-02-06', 'UnderReview',
+ 'I live in a quiet apartment and would like to adopt a calm cat.',
+ 'Lives alone in a quiet apartment. No other pets.',
+ 'Remote worker with flexible schedule.',
+ FALSE,
+ TRUE,
+ 'No current pets.',
+ 3,
+ NULL),
+
+(3, 3, '2026-02-07', 'Pending',
+ 'I am interested in adopting Max after he recovers.',
+ 'Lives in a house with enough space for a large dog.',
+ 'Works full-time but can walk the dog before and after work.',
+ TRUE,
+ TRUE,
+ 'Has one medium-sized dog that is friendly with other dogs.',
+ NULL,
+ NULL),
+
+(4, 4, '2025-10-10', 'Approved',
+ 'I have owned cats before and can provide a stable home.',
+ 'Lives in an apartment with children. Family has experience with cats.',
+ 'Part-time work schedule, usually home in the afternoon.',
+ FALSE,
+ TRUE,
+ 'No current pets.',
+ 3,
+ '2025-10-12'),
+
+(5, 1, '2026-02-08', 'Rejected',
+ 'I would also like to adopt Rocky as a companion dog.',
+ 'Lives in a house, but already has a pending application for Buddy.',
+ 'Full-time office job.',
+ TRUE,
+ TRUE,
+ 'Currently has one older friendly dog.',
+ 3,
+ '2026-02-09'),
+
+(6, 5, '2026-02-10', 'Approved',
+ 'I have experience caring for rabbits and want to adopt Daisy.',
+ 'Lives in a townhouse with a dedicated indoor pet area.',
+ 'Works from home three days a week.',
+ FALSE,
+ TRUE,
+ 'Currently has one calm adult cat.',
+ 3,
+ '2026-02-12');

@@ -22,7 +22,9 @@ public class AdoptionApplicationsController : ControllerBase
         await connection.OpenAsync();
 
         var sql = @"SELECT application_id, animal_id, applicant_id, application_date,
-                           status, reason, reviewed_by, reviewed_date, created_at
+                           status, reason, living_situation, work_schedule, has_yard,
+                           landlord_approval, other_pets_details,
+                           reviewed_by, reviewed_date, created_at
                     FROM adoption_applications ORDER BY application_id";
 
         await using var command = new MySqlCommand(sql, connection);
@@ -43,7 +45,9 @@ public class AdoptionApplicationsController : ControllerBase
         await connection.OpenAsync();
 
         var sql = @"SELECT application_id, animal_id, applicant_id, application_date,
-                           status, reason, reviewed_by, reviewed_date, created_at
+                           status, reason, living_situation, work_schedule, has_yard,
+                           landlord_approval, other_pets_details,
+                           reviewed_by, reviewed_date, created_at
                     FROM adoption_applications WHERE application_id = @id";
 
         await using var command = new MySqlCommand(sql, connection);
@@ -64,7 +68,9 @@ public class AdoptionApplicationsController : ControllerBase
         await connection.OpenAsync();
 
         var sql = @"SELECT application_id, animal_id, applicant_id, application_date,
-                           status, reason, reviewed_by, reviewed_date, created_at
+                           status, reason, living_situation, work_schedule, has_yard,
+                           landlord_approval, other_pets_details,
+                           reviewed_by, reviewed_date, created_at
                     FROM adoption_applications WHERE animal_id = @animalId ORDER BY application_date DESC";
 
         await using var command = new MySqlCommand(sql, connection);
@@ -85,8 +91,13 @@ public class AdoptionApplicationsController : ControllerBase
         await using var connection = new MySqlConnection(_configuration.GetConnectionString("DefaultConnection"));
         await connection.OpenAsync();
 
-        var sql = @"INSERT INTO adoption_applications (animal_id, applicant_id, application_date, status, reason, reviewed_by, reviewed_date)
-                    VALUES (@animalId, @applicantId, @applicationDate, @status, @reason, @reviewedBy, @reviewedDate);
+        var sql = @"INSERT INTO adoption_applications
+                        (animal_id, applicant_id, application_date, status, reason,
+                         living_situation, work_schedule, has_yard, landlord_approval, other_pets_details,
+                         reviewed_by, reviewed_date)
+                    VALUES (@animalId, @applicantId, @applicationDate, @status, @reason,
+                            @livingSituation, @workSchedule, @hasYard, @landlordApproval, @otherPetsDetails,
+                            @reviewedBy, @reviewedDate);
                     SELECT LAST_INSERT_ID();";
 
         await using var command = new MySqlCommand(sql, connection);
@@ -95,6 +106,11 @@ public class AdoptionApplicationsController : ControllerBase
         command.Parameters.AddWithValue("@applicationDate", req.ApplicationDate);
         command.Parameters.AddWithValue("@status", req.Status ?? "Pending");
         command.Parameters.AddWithValue("@reason", (object?)req.Reason ?? DBNull.Value);
+        command.Parameters.AddWithValue("@livingSituation", (object?)req.LivingSituation ?? DBNull.Value);
+        command.Parameters.AddWithValue("@workSchedule", (object?)req.WorkSchedule ?? DBNull.Value);
+        command.Parameters.AddWithValue("@hasYard", req.HasYard);
+        command.Parameters.AddWithValue("@landlordApproval", req.LandlordApproval);
+        command.Parameters.AddWithValue("@otherPetsDetails", (object?)req.OtherPetsDetails ?? DBNull.Value);
         command.Parameters.AddWithValue("@reviewedBy", (object?)req.ReviewedBy ?? DBNull.Value);
         command.Parameters.AddWithValue("@reviewedDate", (object?)req.ReviewedDate ?? DBNull.Value);
 
@@ -110,7 +126,11 @@ public class AdoptionApplicationsController : ControllerBase
 
         var sql = @"UPDATE adoption_applications SET
                         animal_id = @animalId, applicant_id = @applicantId, application_date = @applicationDate,
-                        status = @status, reason = @reason, reviewed_by = @reviewedBy, reviewed_date = @reviewedDate
+                        status = @status, reason = @reason,
+                        living_situation = @livingSituation, work_schedule = @workSchedule,
+                        has_yard = @hasYard, landlord_approval = @landlordApproval,
+                        other_pets_details = @otherPetsDetails,
+                        reviewed_by = @reviewedBy, reviewed_date = @reviewedDate
                     WHERE application_id = @id";
 
         await using var command = new MySqlCommand(sql, connection);
@@ -120,6 +140,11 @@ public class AdoptionApplicationsController : ControllerBase
         command.Parameters.AddWithValue("@applicationDate", req.ApplicationDate);
         command.Parameters.AddWithValue("@status", req.Status ?? "Pending");
         command.Parameters.AddWithValue("@reason", (object?)req.Reason ?? DBNull.Value);
+        command.Parameters.AddWithValue("@livingSituation", (object?)req.LivingSituation ?? DBNull.Value);
+        command.Parameters.AddWithValue("@workSchedule", (object?)req.WorkSchedule ?? DBNull.Value);
+        command.Parameters.AddWithValue("@hasYard", req.HasYard);
+        command.Parameters.AddWithValue("@landlordApproval", req.LandlordApproval);
+        command.Parameters.AddWithValue("@otherPetsDetails", (object?)req.OtherPetsDetails ?? DBNull.Value);
         command.Parameters.AddWithValue("@reviewedBy", (object?)req.ReviewedBy ?? DBNull.Value);
         command.Parameters.AddWithValue("@reviewedDate", (object?)req.ReviewedDate ?? DBNull.Value);
 
@@ -176,6 +201,11 @@ public class AdoptionApplicationsController : ControllerBase
         applicationDate = reader.GetDateTime("application_date").ToString("yyyy-MM-dd"),
         status = reader.IsDBNull(reader.GetOrdinal("status")) ? null : reader.GetString("status"),
         reason = reader.IsDBNull(reader.GetOrdinal("reason")) ? null : reader.GetString("reason"),
+        livingSituation = reader.IsDBNull(reader.GetOrdinal("living_situation")) ? null : reader.GetString("living_situation"),
+        workSchedule = reader.IsDBNull(reader.GetOrdinal("work_schedule")) ? null : reader.GetString("work_schedule"),
+        hasYard = reader.GetBoolean("has_yard"),
+        landlordApproval = reader.GetBoolean("landlord_approval"),
+        otherPetsDetails = reader.IsDBNull(reader.GetOrdinal("other_pets_details")) ? null : reader.GetString("other_pets_details"),
         reviewedBy = reader.IsDBNull(reader.GetOrdinal("reviewed_by")) ? (int?)null : reader.GetInt32("reviewed_by"),
         reviewedDate = reader.IsDBNull(reader.GetOrdinal("reviewed_date")) ? null : reader.GetDateTime("reviewed_date").ToString("yyyy-MM-dd"),
         createdAt = reader.GetDateTime("created_at")
@@ -188,6 +218,11 @@ public record AdoptionApplicationRequest(
     string ApplicationDate,
     string? Status,
     string? Reason,
+    string? LivingSituation,
+    string? WorkSchedule,
+    bool HasYard,
+    bool LandlordApproval,
+    string? OtherPetsDetails,
     int? ReviewedBy,
     string? ReviewedDate
 );

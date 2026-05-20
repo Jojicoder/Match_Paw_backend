@@ -1,3 +1,11 @@
+-- Drop in reverse FK dependency order
+DROP TABLE IF EXISTS adoption_applications;
+DROP TABLE IF EXISTS care_logs;
+DROP TABLE IF EXISTS medical_records;
+DROP TABLE IF EXISTS applicants;
+DROP TABLE IF EXISTS animals;
+DROP TABLE IF EXISTS users;
+
 CREATE TABLE animals (
     animal_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -6,12 +14,11 @@ CREATE TABLE animals (
     age INT,
     sex VARCHAR(20),
     intake_date DATE,
-    adoption_status VARCHAR(50) DEFAULT 'Available',
+    adoption_status ENUM('Available', 'Pending', 'Adopted', 'Unavailable') DEFAULT 'Available',
     health_status VARCHAR(100),
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
 
 CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -32,6 +39,7 @@ CREATE TABLE medical_records (
     veterinarian_name VARCHAR(100),
     next_appointment DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
     FOREIGN KEY (animal_id) REFERENCES animals(animal_id)
 );
 
@@ -44,6 +52,7 @@ CREATE TABLE care_logs (
     cleaning_notes TEXT,
     behavior_notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
     FOREIGN KEY (animal_id) REFERENCES animals(animal_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
@@ -54,6 +63,13 @@ CREATE TABLE applicants (
     email VARCHAR(150) NOT NULL,
     phone VARCHAR(30),
     address VARCHAR(255),
+
+    housing_type VARCHAR(50),
+    has_pets BOOLEAN DEFAULT FALSE,
+    has_children BOOLEAN DEFAULT FALSE,
+    experience_with_pets VARCHAR(100),
+    preferred_contact_method VARCHAR(50),
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -62,11 +78,19 @@ CREATE TABLE adoption_applications (
     animal_id INT NOT NULL,
     applicant_id INT NOT NULL,
     application_date DATE NOT NULL,
-    status VARCHAR(50) DEFAULT 'Pending',
+    status ENUM('Pending', 'UnderReview', 'Approved', 'Rejected') DEFAULT 'Pending',
+
     reason TEXT,
+    living_situation TEXT,
+    work_schedule VARCHAR(100),
+    has_yard BOOLEAN DEFAULT FALSE,
+    landlord_approval BOOLEAN DEFAULT FALSE,
+    other_pets_details TEXT,
+
     reviewed_by INT,
     reviewed_date DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
     FOREIGN KEY (animal_id) REFERENCES animals(animal_id),
     FOREIGN KEY (applicant_id) REFERENCES applicants(applicant_id),
     FOREIGN KEY (reviewed_by) REFERENCES users(user_id)
