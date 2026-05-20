@@ -191,7 +191,12 @@ Content-Type: application/json
   "fullName": "Jane Doe",
   "email": "jane.doe@example.com",
   "phone": "555-999-8888",
-  "address": "100 Broadway, New York, NY"
+  "address": "100 Broadway, New York, NY",
+  "housingType": "Apartment",
+  "hasPets": false,
+  "hasChildren": false,
+  "experienceWithPets": "First-time pet owner",
+  "preferredContactMethod": "Email"
 }
 
 ### Update applicant
@@ -202,7 +207,12 @@ Content-Type: application/json
   "fullName": "John Smith",
   "email": "john.smith@example.com",
   "phone": "555-123-4567",
-  "address": "123 Main Street, Queens, NY"
+  "address": "123 Main Street, Queens, NY",
+  "housingType": "House",
+  "hasPets": true,
+  "hasChildren": true,
+  "experienceWithPets": "Experienced with dogs",
+  "preferredContactMethod": "Email"
 }
 
 ### Delete applicant
@@ -230,7 +240,33 @@ Content-Type: application/json
   "applicantId": 1,
   "applicationDate": "2026-05-20",
   "status": "Pending",
-  "reason": "I have experience with dogs and a large yard."
+  "reason": "I have experience with dogs and a large yard.",
+  "livingSituation": "Lives in a house with a fenced backyard.",
+  "workSchedule": "Full-time office job, family members home during the day.",
+  "hasYard": true,
+  "landlordApproval": true,
+  "otherPetsDetails": "Currently has one older friendly dog.",
+  "reviewedBy": null,
+  "reviewedDate": null
+}
+
+### Update adoption application
+PUT {{base}}/api/adoptionapplications/1
+Content-Type: application/json
+
+{
+  "animalId": 1,
+  "applicantId": 1,
+  "applicationDate": "2026-05-20",
+  "status": "UnderReview",
+  "reason": "Updated reason.",
+  "livingSituation": "Lives in a house with a fenced backyard.",
+  "workSchedule": "Full-time office job.",
+  "hasYard": true,
+  "landlordApproval": true,
+  "otherPetsDetails": "No other pets.",
+  "reviewedBy": 3,
+  "reviewedDate": null
 }
 
 ### Update application status
