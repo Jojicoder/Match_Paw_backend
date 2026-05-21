@@ -21,7 +21,7 @@ public class ApplicantsController : ControllerBase
         await using var connection = new MySqlConnection(_configuration.GetConnectionString("DefaultConnection"));
         await connection.OpenAsync();
 
-        var sql = "SELECT applicant_id, full_name, email, phone, address, housing_type, has_pets, has_children, experience_with_pets, preferred_contact_method, created_at FROM applicants ORDER BY applicant_id";
+        var sql = "SELECT applicant_id, full_name, email, is_active, phone, address, housing_type, has_pets, has_children, experience_with_pets, preferred_contact_method, created_at FROM applicants ORDER BY applicant_id";
         await using var command = new MySqlCommand(sql, connection);
         await using var reader = await command.ExecuteReaderAsync();
 
@@ -39,7 +39,7 @@ public class ApplicantsController : ControllerBase
         await using var connection = new MySqlConnection(_configuration.GetConnectionString("DefaultConnection"));
         await connection.OpenAsync();
 
-        var sql = "SELECT applicant_id, full_name, email, phone, address, housing_type, has_pets, has_children, experience_with_pets, preferred_contact_method, created_at FROM applicants WHERE applicant_id = @id";
+        var sql = "SELECT applicant_id, full_name, email, is_active, phone, address, housing_type, has_pets, has_children, experience_with_pets, preferred_contact_method, created_at FROM applicants WHERE applicant_id = @id";
         await using var command = new MySqlCommand(sql, connection);
         command.Parameters.AddWithValue("@id", id);
         await using var reader = await command.ExecuteReaderAsync();
@@ -56,13 +56,17 @@ public class ApplicantsController : ControllerBase
         await using var connection = new MySqlConnection(_configuration.GetConnectionString("DefaultConnection"));
         await connection.OpenAsync();
 
-        var sql = @"INSERT INTO applicants (full_name, email, phone, address, housing_type, has_pets, has_children, experience_with_pets, preferred_contact_method)
-                    VALUES (@fullName, @email, @phone, @address, @housingType, @hasPets, @hasChildren, @experienceWithPets, @preferredContactMethod);
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword(req.Password);
+
+        var sql = @"INSERT INTO applicants (full_name, email, password_hash, is_active, phone, address, housing_type, has_pets, has_children, experience_with_pets, preferred_contact_method)
+                    VALUES (@fullName, @email, @passwordHash, @isActive, @phone, @address, @housingType, @hasPets, @hasChildren, @experienceWithPets, @preferredContactMethod);
                     SELECT LAST_INSERT_ID();";
 
         await using var command = new MySqlCommand(sql, connection);
         command.Parameters.AddWithValue("@fullName", req.FullName);
         command.Parameters.AddWithValue("@email", req.Email);
+        command.Parameters.AddWithValue("@passwordHash", passwordHash);
+        command.Parameters.AddWithValue("@isActive", req.IsActive ?? true);
         command.Parameters.AddWithValue("@phone", (object?)req.Phone ?? DBNull.Value);
         command.Parameters.AddWithValue("@address", (object?)req.Address ?? DBNull.Value);
         command.Parameters.AddWithValue("@housingType", (object?)req.HousingType ?? DBNull.Value);
@@ -81,7 +85,11 @@ public class ApplicantsController : ControllerBase
         await using var connection = new MySqlConnection(_configuration.GetConnectionString("DefaultConnection"));
         await connection.OpenAsync();
 
-        var sql = @"UPDATE applicants SET full_name = @fullName, email = @email, phone = @phone, address = @address,
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword(req.Password);
+
+        var sql = @"UPDATE applicants SET full_name = @fullName, email = @email,
+                        password_hash = @passwordHash, is_active = @isActive,
+                        phone = @phone, address = @address,
                         housing_type = @housingType, has_pets = @hasPets, has_children = @hasChildren,
                         experience_with_pets = @experienceWithPets, preferred_contact_method = @preferredContactMethod
                     WHERE applicant_id = @id";
@@ -90,6 +98,8 @@ public class ApplicantsController : ControllerBase
         command.Parameters.AddWithValue("@id", id);
         command.Parameters.AddWithValue("@fullName", req.FullName);
         command.Parameters.AddWithValue("@email", req.Email);
+        command.Parameters.AddWithValue("@passwordHash", passwordHash);
+        command.Parameters.AddWithValue("@isActive", req.IsActive ?? true);
         command.Parameters.AddWithValue("@phone", (object?)req.Phone ?? DBNull.Value);
         command.Parameters.AddWithValue("@address", (object?)req.Address ?? DBNull.Value);
         command.Parameters.AddWithValue("@housingType", (object?)req.HousingType ?? DBNull.Value);
@@ -103,6 +113,32 @@ public class ApplicantsController : ControllerBase
             return NotFound();
 
         return NoContent();
+    }
+
+    [HttpPost("verify-password")]
+    public async Task<IActionResult> VerifyPassword([FromBody] ApplicantPasswordVerifyRequest req)
+    {
+        await using var connection = new MySqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+        await connection.OpenAsync();
+
+        var sql = "SELECT applicant_id, password_hash, is_active FROM applicants WHERE email = @email";
+        await using var command = new MySqlCommand(sql, connection);
+        command.Parameters.AddWithValue("@email", req.Email);
+        await using var reader = await command.ExecuteReaderAsync();
+
+        if (!await reader.ReadAsync())
+            return Unauthorized(new { message = "Invalid email or password" });
+
+        if (!reader.GetBoolean("is_active"))
+            return Unauthorized(new { message = "Account is inactive" });
+
+        var hash = reader.GetString("password_hash");
+        var applicantId = reader.GetInt32("applicant_id");
+
+        if (!BCrypt.Net.BCrypt.Verify(req.Password, hash))
+            return Unauthorized(new { message = "Invalid email or password" });
+
+        return Ok(new { applicantId });
     }
 
     [HttpDelete("{id}")]
@@ -126,6 +162,7 @@ public class ApplicantsController : ControllerBase
         applicantId = reader.GetInt32("applicant_id"),
         fullName = reader.GetString("full_name"),
         email = reader.GetString("email"),
+        isActive = reader.GetBoolean("is_active"),
         phone = reader.IsDBNull(reader.GetOrdinal("phone")) ? null : reader.GetString("phone"),
         address = reader.IsDBNull(reader.GetOrdinal("address")) ? null : reader.GetString("address"),
         housingType = reader.IsDBNull(reader.GetOrdinal("housing_type")) ? null : reader.GetString("housing_type"),
@@ -140,11 +177,18 @@ public class ApplicantsController : ControllerBase
 public record ApplicantRequest(
     string FullName,
     string Email,
+    string Password,
     string? Phone,
     string? Address,
     string? HousingType,
     bool HasPets,
     bool HasChildren,
     string? ExperienceWithPets,
-    string? PreferredContactMethod
+    string? PreferredContactMethod,
+    bool? IsActive
+);
+
+public record ApplicantPasswordVerifyRequest(
+    string Email,
+    string Password
 );

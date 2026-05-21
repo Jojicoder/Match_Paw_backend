@@ -51,13 +51,13 @@ VALUES
 -- =========================
 
 INSERT INTO applicants
-(full_name, email, phone, address, housing_type, has_pets, has_children, experience_with_pets, preferred_contact_method)
+(full_name, email, password_hash, is_active, phone, address, housing_type, has_pets, has_children, experience_with_pets, preferred_contact_method)
 VALUES
-('John Smith', 'john.smith@example.com', '555-123-4567', '123 Main Street, Queens, NY', 'House', TRUE, TRUE, 'Experienced with dogs', 'Email'),
-('Maria Garcia', 'maria.garcia@example.com', '555-234-5678', '45 Park Avenue, Brooklyn, NY', 'Apartment', FALSE, FALSE, 'First-time pet owner', 'Email'),
-('Kevin Wilson', 'kevin.wilson@example.com', '555-345-6789', '88 River Road, Bronx, NY', 'House', TRUE, FALSE, 'Experienced with large dogs', 'Phone'),
-('Aiko Tanaka', 'aiko.tanaka@example.com', '555-456-7890', '19 Maple Street, New York, NY', 'Apartment', FALSE, TRUE, 'Grew up with cats', 'Email'),
-('Olivia Martinez', 'olivia.martinez@example.com', '555-567-8901', '200 Garden Avenue, Jersey City, NJ', 'Townhouse', TRUE, FALSE, 'Has experience with rabbits and cats', 'Phone');
+('John Smith', 'john.smith@example.com', 'TEMP_HASH_APPLICANT1', TRUE, '555-123-4567', '123 Main Street, Queens, NY', 'House', TRUE, TRUE, 'Experienced with dogs', 'Email'),
+('Maria Garcia', 'maria.garcia@example.com', 'TEMP_HASH_APPLICANT2', TRUE, '555-234-5678', '45 Park Avenue, Brooklyn, NY', 'Apartment', FALSE, FALSE, 'First-time pet owner', 'Email'),
+('Kevin Wilson', 'kevin.wilson@example.com', 'TEMP_HASH_APPLICANT3', TRUE, '555-345-6789', '88 River Road, Bronx, NY', 'House', TRUE, FALSE, 'Experienced with large dogs', 'Phone'),
+('Aiko Tanaka', 'aiko.tanaka@example.com', 'TEMP_HASH_APPLICANT4', TRUE, '555-456-7890', '19 Maple Street, New York, NY', 'Apartment', FALSE, TRUE, 'Grew up with cats', 'Email'),
+('Olivia Martinez', 'olivia.martinez@example.com', 'TEMP_HASH_APPLICANT5', TRUE, '555-567-8901', '200 Garden Avenue, Jersey City, NJ', 'Townhouse', TRUE, FALSE, 'Has experience with rabbits and cats', 'Phone');
 
 -- =========================
 -- 4. medical_records

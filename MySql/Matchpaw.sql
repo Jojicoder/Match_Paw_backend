@@ -60,7 +60,8 @@ CREATE TABLE care_logs (
 CREATE TABLE applicants (
     applicant_id INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
-    email VARCHAR(150) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
     phone VARCHAR(30),
     address VARCHAR(255),
 
@@ -70,6 +71,7 @@ CREATE TABLE applicants (
     experience_with_pets VARCHAR(100),
     preferred_contact_method VARCHAR(50),
 
+    is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
