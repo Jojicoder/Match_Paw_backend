@@ -1,0 +1,11 @@
+bin/
+obj/
+publish/
+.vs/
+.vscode/
+*.user
+*.suo
+appsettings.Production.json
+deploy.zip
+deploy*.zip
+.env

@@ -1,0 +1,420 @@
+@base = https://matchpaw-api-gxd2eggnhdgefsej.eastus-01.azurewebsites.net
+
+# =====================
+# Health
+# =====================
+
+### Check server status
+GET {{base}}/api/health
+
+### Check database connection
+GET {{base}}/api/health/db
+
+# =====================
+# Animals
+# =====================
+
+### Get all animals
+GET {{base}}/api/animals
+
+### Get animal by ID
+GET {{base}}/api/animals/1
+
+### Create animal
+POST {{base}}/api/animals
+Content-Type: application/json
+
+{
+  "name": "Mochi",
+  "species": "Cat",
+  "breed": "Scottish Fold",
+  "age": 3,
+  "sex": "Female",
+  "intakeDate": "2026-05-01",
+  "adoptionStatus": "Available",
+  "healthStatus": "Healthy",
+  "notes": "Gentle and quiet. Good for apartment living.",
+  "photoUrl": null
+}
+
+### Update animal
+PUT {{base}}/api/animals/1
+Content-Type: application/json
+
+{
+  "name": "Buddy",
+  "species": "Dog",
+  "breed": "Labrador Retriever",
+  "age": 4,
+  "sex": "Male",
+  "intakeDate": "2025-11-10",
+  "adoptionStatus": "Available",
+  "healthStatus": "Healthy",
+  "notes": "Updated notes.",
+  "photoUrl": "https://matchpawstorage.blob.core.windows.net/animal-photos/example.jpg"
+}
+
+### Delete animal
+DELETE {{base}}/api/animals/1
+
+# =====================
+# Blob Storage
+# =====================
+
+### Get SAS URL for image upload (step 1)
+GET {{base}}/api/blob/sas-url?fileName=cat.jpg
+
+### Upload image to Azure using the sasUrl returned above (step 2)
+# PUT <sasUrl>
+# x-ms-blob-type: BlockBlob
+# Content-Type: image/jpeg
+# <binary image data>
+
+# =====================
+# Users
+# =====================
+
+### Get all users
+GET {{base}}/api/users
+
+### Get user by ID
+GET {{base}}/api/users/1
+
+### Create user (password is automatically hashed)
+POST {{base}}/api/users
+Content-Type: application/json
+
+{
+  "fullName": "New Staff",
+  "email": "newstaff@matchpaw.org",
+  "password": "securepassword123",
+  "role": "Staff",
+  "isActive": true
+}
+
+### Update user (password is optional — omit to keep existing)
+PUT {{base}}/api/users/1
+Content-Type: application/json
+
+{
+  "fullName": "Updated Staff",
+  "email": "newstaff@matchpaw.org",
+  "password": null,
+  "role": "Staff",
+  "isActive": true
+}
+
+### Login (returns JWT token)
+POST {{base}}/api/users/login
+Content-Type: application/json
+
+{
+  "email": "newstaff@matchpaw.org",
+  "password": "securepassword123"
+}
+
+### Change password
+POST {{base}}/api/users/1/change-password
+Content-Type: application/json
+
+{
+  "currentPassword": "securepassword123",
+  "newPassword": "newpassword456"
+}
+
+### Delete user
+DELETE {{base}}/api/users/1
+
+# =====================
+# Medical Records
+# =====================
+
+### Get all medical records
+GET {{base}}/api/medicalrecords
+
+### Get medical record by ID
+GET {{base}}/api/medicalrecords/1
+
+### Get medical records by animal
+GET {{base}}/api/medicalrecords/animal/1
+
+### Create medical record
+POST {{base}}/api/medicalrecords
+Content-Type: application/json
+
+{
+  "animalId": 1,
+  "recordDate": "2026-05-20",
+  "treatmentType": "Vaccination",
+  "description": "Annual vaccination completed.",
+  "veterinarianName": "Dr. Smith",
+  "nextAppointment": "2027-05-20"
+}
+
+### Update medical record
+PUT {{base}}/api/medicalrecords/1
+Content-Type: application/json
+
+{
+  "animalId": 1,
+  "recordDate": "2025-11-12",
+  "treatmentType": "Initial Checkup",
+  "description": "Updated description.",
+  "veterinarianName": "Dr. Miller",
+  "nextAppointment": "2026-11-12"
+}
+
+### Delete medical record
+DELETE {{base}}/api/medicalrecords/1
+
+# =====================
+# Care Logs
+# =====================
+
+### Get all care logs
+GET {{base}}/api/carelogs
+
+### Get care log by ID
+GET {{base}}/api/carelogs/1
+
+### Get care logs by animal
+GET {{base}}/api/carelogs/animal/1
+
+### Create care log
+POST {{base}}/api/carelogs
+Content-Type: application/json
+
+{
+  "animalId": 1,
+  "userId": 2,
+  "logDate": "2026-05-20",
+  "feedingNotes": "Ate all food.",
+  "cleaningNotes": "Kennel cleaned.",
+  "behaviorNotes": "Very playful today."
+}
+
+### Update care log
+PUT {{base}}/api/carelogs/1
+Content-Type: application/json
+
+{
+  "animalId": 1,
+  "userId": 2,
+  "logDate": "2026-02-01",
+  "feedingNotes": "Updated feeding notes.",
+  "cleaningNotes": "Updated cleaning notes.",
+  "behaviorNotes": "Updated behavior notes."
+}
+
+### Delete care log
+DELETE {{base}}/api/carelogs/1
+
+# =====================
+# Applicants
+# =====================
+
+### Get all applicants
+GET {{base}}/api/applicants
+
+### Get applicant by ID
+GET {{base}}/api/applicants/1
+
+### Create applicant (password is automatically hashed)
+POST {{base}}/api/applicants
+Content-Type: application/json
+
+{
+  "fullName": "Jane Doe",
+  "email": "jane.doe@example.com",
+  "password": "password123",
+  "phone": "555-999-8888",
+  "address": "100 Broadway, New York, NY",
+  "housingType": "Apartment",
+  "hasPets": false,
+  "hasChildren": false,
+  "experienceWithPets": "First-time pet owner",
+  "preferredContactMethod": "Email"
+}
+
+### Update applicant (password is optional — omit to keep existing)
+PUT {{base}}/api/applicants/1
+Content-Type: application/json
+
+{
+  "fullName": "John Smith",
+  "email": "john.smith@example.com",
+  "password": null,
+  "phone": "555-123-4567",
+  "address": "123 Main Street, Queens, NY",
+  "housingType": "House",
+  "hasPets": true,
+  "hasChildren": true,
+  "experienceWithPets": "Experienced with dogs",
+  "preferredContactMethod": "Email"
+}
+
+### Login (returns JWT token)
+POST {{base}}/api/applicants/login
+Content-Type: application/json
+
+{
+  "email": "jane.doe@example.com",
+  "password": "password123"
+}
+
+### Change password
+POST {{base}}/api/applicants/1/change-password
+Content-Type: application/json
+
+{
+  "currentPassword": "password123",
+  "newPassword": "newpass456"
+}
+
+### Delete applicant
+DELETE {{base}}/api/applicants/1
+
+# =====================
+# Adoption Applications
+# =====================
+
+### Get all adoption applications
+GET {{base}}/api/adoptionapplications
+
+### Get adoption application by ID
+GET {{base}}/api/adoptionapplications/1
+
+### Get adoption applications by animal
+GET {{base}}/api/adoptionapplications/animal/1
+
+### Create adoption application
+POST {{base}}/api/adoptionapplications
+Content-Type: application/json
+
+{
+  "animalId": 1,
+  "applicantId": 1,
+  "applicationDate": "2026-05-20",
+  "status": "Pending",
+  "reason": "I have experience with dogs and a large yard.",
+  "livingSituation": "Lives in a house with a fenced backyard.",
+  "workSchedule": "Full-time office job, family members home during the day.",
+  "hasYard": true,
+  "landlordApproval": true,
+  "otherPetsDetails": "Currently has one older friendly dog.",
+  "reviewedBy": null,
+  "reviewedDate": null
+}
+
+### Update adoption application
+PUT {{base}}/api/adoptionapplications/1
+Content-Type: application/json
+
+{
+  "animalId": 1,
+  "applicantId": 1,
+  "applicationDate": "2026-05-20",
+  "status": "UnderReview",
+  "reason": "Updated reason.",
+  "livingSituation": "Lives in a house with a fenced backyard.",
+  "workSchedule": "Full-time office job.",
+  "hasYard": true,
+  "landlordApproval": true,
+  "otherPetsDetails": "No other pets.",
+  "reviewedBy": 3,
+  "reviewedDate": null
+}
+
+### Update application status
+PATCH {{base}}/api/adoptionapplications/1/status
+Content-Type: application/json
+
+{
+  "status": "Approved",
+  "reviewedBy": 3,
+  "reviewedDate": "2026-05-20"
+}
+
+### Delete adoption application
+DELETE {{base}}/api/adoptionapplications/1
+
+# =====================
+# Demo Account Setup
+# Run these once to create demo accounts in TiDB
+# =====================
+
+### [STEP 1] Create demo account - before submitting (no application)
+### Login: demo.new@matchpaw.com / Demo1234
+POST {{base}}/api/applicants
+Content-Type: application/json
+
+{
+  "fullName": "Demo New User",
+  "email": "demo.new@matchpaw.com",
+  "password": "Demo1234",
+  "phone": "555-000-0001",
+  "address": "1 Demo Street, New York, NY",
+  "housingType": "Apartment",
+  "hasPets": false,
+  "hasChildren": false,
+  "experienceWithPets": "First-time pet owner",
+  "preferredContactMethod": "Email",
+  "isActive": true
+}
+
+### [STEP 2] Create demo account - has pending application
+### Login: demo.pending@matchpaw.com / Demo1234
+POST {{base}}/api/applicants
+Content-Type: application/json
+
+{
+  "fullName": "Demo Pending User",
+  "email": "demo.pending@matchpaw.com",
+  "password": "Demo1234",
+  "phone": "555-000-0002",
+  "address": "2 Demo Street, New York, NY",
+  "housingType": "House",
+  "hasPets": false,
+  "hasChildren": false,
+  "experienceWithPets": "No prior experience",
+  "preferredContactMethod": "Email",
+  "isActive": true
+}
+
+### [STEP 3] Create pending application for demo.pending account
+### Replace applicantId with the ID returned from STEP 2
+POST {{base}}/api/adoptionapplications
+Content-Type: application/json
+
+{
+  "animalId": 1,
+  "applicantId": 7,
+  "applicationDate": "2026-05-25",
+  "status": "Pending",
+  "reason": "I would love to give Buddy a loving home.",
+  "livingSituation": "Lives in a house with enough space for a dog.",
+  "workSchedule": "Works from home full-time.",
+  "hasYard": true,
+  "landlordApproval": true,
+  "otherPetsDetails": "No current pets.",
+  "reviewedBy": null,
+  "reviewedDate": null
+}
+
+### [VERIFY] Login with demo new account (should succeed, no applications)
+POST {{base}}/api/applicants/login
+Content-Type: application/json
+
+{
+  "email": "demo.new@matchpaw.com",
+  "password": "Demo1234"
+}
+
+### [VERIFY] Login with demo pending account (should succeed, has pending app)
+POST {{base}}/api/applicants/login
+Content-Type: application/json
+
+{
+  "email": "demo.pending@matchpaw.com",
+  "password": "Demo1234"
+}
